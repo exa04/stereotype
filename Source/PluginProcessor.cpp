@@ -88,11 +88,9 @@ void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     auto* channelDataL = buffer.getWritePointer(0);
     auto* channelDataR = buffer.getWritePointer(1);
     for (int i = 0; i < buffer.getNumSamples(); ++i) {
-        auto outL = 0.0f;
-        auto outR = 0.0f;
+        auto outL = channelDataL[i] * mLtoL.get() / 100;
+        auto outR = channelDataR[i] * mRtoR.get() / 100;
 
-        outL = channelDataL[i] * mLtoL.get() / 100;
-        outR = channelDataR[i] * mRtoR.get() / 100;
         outR += channelDataL[i] * mLtoR.get() / 100;
         outL += channelDataR[i] * mRtoL.get() / 100;
 
