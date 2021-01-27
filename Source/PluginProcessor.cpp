@@ -62,10 +62,11 @@ StereotypeAudioProcessor::StereotypeAudioProcessor()
             [](float v, int) { return juce::String(v, 1); },
             [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
 
-        std::make_unique<juce::AudioParameterInt>(OffsetParam,
+        std::make_unique<juce::AudioParameterFloat>(OffsetParam,
             TRANS("Stereo offset"),
-            -2048,2048,0,
-            "smp.",
+            juce::NormalisableRange<float>(-2047.0f, 2047.0f, 0.001, 0.2f, true),
+            mOffset.get(), "smp",
+            juce::AudioProcessorParameter::genericParameter,
             [](float v, int) { return juce::String(v, 1); },
             [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
 
@@ -83,6 +84,7 @@ void StereotypeAudioProcessor::parameterChanged(const juce::String& parameterID,
     if (parameterID == LtoRParam) mLtoR = newValue;
     if (parameterID == RtoRParam) mRtoR = newValue;
     if (parameterID == RtoLParam) mRtoL = newValue;
+    if (parameterID == OffsetParam) mOffset = newValue;
 }
 
 void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
