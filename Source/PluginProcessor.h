@@ -66,10 +66,18 @@ public:
     juce::Atomic<float> mLtoR{ 0.0f };
     juce::Atomic<float> mRtoR{ 100.0f };
     juce::Atomic<float> mRtoL{ 0.0f };
+
+    juce::Atomic<int> mOffset{ -120 };
+
 private:
 
     juce::UndoManager mUndoManager;
     juce::AudioProcessorValueTreeState mState;
+
+    float audioData[2048][2];
+
+    int audioRead = 0;
+    int audioWrite = 0;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereotypeAudioProcessor)
 };
