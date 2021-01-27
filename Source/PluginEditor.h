@@ -33,10 +33,12 @@ private:
     juce::Slider LtoRSlider;
     juce::Slider RtoRSlider;
     juce::Slider RtoLSlider;
+    juce::Slider OffsetSlider;
     juce::Label LtoLLabel;
     juce::Label LtoRLabel;
     juce::Label RtoRLabel;
     juce::Label RtoLLabel;
+    juce::Label OffsetLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereotypeAudioProcessorEditor)
 
@@ -44,5 +46,6 @@ private:
     juce::AudioProcessorValueTreeState::SliderAttachment LtoRAttachment{ audioProcessor.getValueTreeState(), StereotypeAudioProcessor::LtoRParam, LtoRSlider };
     juce::AudioProcessorValueTreeState::SliderAttachment RtoRAttachment{ audioProcessor.getValueTreeState(), StereotypeAudioProcessor::RtoRParam, RtoRSlider };
     juce::AudioProcessorValueTreeState::SliderAttachment RtoLAttachment{ audioProcessor.getValueTreeState(), StereotypeAudioProcessor::RtoLParam, RtoLSlider };
+    juce::AudioProcessorValueTreeState::SliderAttachment OffsetAttachment{ audioProcessor.getValueTreeState(), StereotypeAudioProcessor::OffsetParam, OffsetSlider };
 
 };
