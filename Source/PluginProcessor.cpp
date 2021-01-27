@@ -59,8 +59,7 @@ StereotypeAudioProcessor::StereotypeAudioProcessor()
             mRtoL.get(), "%",
             juce::AudioProcessorParameter::genericParameter,
             [](float v, int) { return juce::String(v, 1); },
-            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
-
+            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); })
         })
 {
     mState.addParameterListener(LtoLParam, this);
@@ -88,14 +87,23 @@ void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
     auto* channelDataL = buffer.getWritePointer(0);
     auto* channelDataR = buffer.getWritePointer(1);
     for (int i = 0; i < buffer.getNumSamples(); ++i) {
-        auto outL = channelDataL[i] * mLtoL.get() / 100;
-        auto outR = channelDataR[i] * mRtoR.get() / 100;
+        audioData[audioWrite][0] = channelDataL[i] * mLtoL.get() / 100;
+        audioData[audioWrite][1] = channelDataR[i] * mRtoR.get() / 100;
 
-        outR += channelDataL[i] * mLtoR.get() / 100;
-        outL += channelDataR[i] * mRtoL.get() / 100;
+        audioData[audioWrite][1] += channelDataL[i] * mLtoR.get() / 100;
+        audioData[audioWrite][0] += channelDataR[i] * mRtoL.get() / 100;
 
-        channelDataL[i] += outL;
-        channelDataR[i] += outR;
+        if (abs(audioWrite) == audioWrite) {
+            channelDataL[i] = audioData[audioWrite][0];
+            channelDataR[i] = audioData[audioRead][1];
+        }
+        else {
+            channelDataR[i] = audioData[audioWrite][1];
+            channelDataL[i] = audioData[audioRead][0];
+        }
+
+        audioWrite = (audioWrite + 1) % 2048;
+        audioRead = (2048 + audioWrite - abs(mOffset.get())) % 2048;
     }
 }
 
