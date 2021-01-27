@@ -68,7 +68,7 @@ public:
     juce::Atomic<float> mRtoR{ 100.0f };
     juce::Atomic<float> mRtoL{ 0.0f };
 
-    juce::Atomic<int> mOffset{ -120 };
+    juce::Atomic<int> mOffset{ 0 };
 
 private:
 
