@@ -61,6 +61,7 @@ public:
     static juce::String LtoRParam;
     static juce::String RtoRParam;
     static juce::String RtoLParam;
+    static juce::String OffsetParam;
 
     juce::Atomic<float> mLtoL{ 100.0f };
     juce::Atomic<float> mLtoR{ 0.0f };
