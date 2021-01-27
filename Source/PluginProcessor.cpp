@@ -15,6 +15,7 @@ juce::String StereotypeAudioProcessor::LtoLParam("Left mix");
 juce::String StereotypeAudioProcessor::LtoRParam("Left to right");
 juce::String StereotypeAudioProcessor::RtoRParam("Right mix");
 juce::String StereotypeAudioProcessor::RtoLParam("Right to left");
+juce::String StereotypeAudioProcessor::OffsetParam("Stereo offset");
 
 StereotypeAudioProcessor::StereotypeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -59,13 +60,22 @@ StereotypeAudioProcessor::StereotypeAudioProcessor()
             mRtoL.get(), "%",
             juce::AudioProcessorParameter::genericParameter,
             [](float v, int) { return juce::String(v, 1); },
-            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); })
+            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
+
+        std::make_unique<juce::AudioParameterInt>(OffsetParam,
+            TRANS("Stereo offset"),
+            -2048,2048,0,
+            "smp.",
+            [](float v, int) { return juce::String(v, 1); },
+            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
+
         })
 {
     mState.addParameterListener(LtoLParam, this);
     mState.addParameterListener(LtoRParam, this);
     mState.addParameterListener(RtoRParam, this);
     mState.addParameterListener(RtoLParam, this);
+    mState.addParameterListener(OffsetParam, this);
 }
 
 void StereotypeAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue) {
