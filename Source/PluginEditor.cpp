@@ -13,9 +13,7 @@
 StereotypeAudioProcessorEditor::StereotypeAudioProcessorEditor (StereotypeAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (600, 160);
+    setSize (600, 200);
 
     addAndMakeVisible(LtoLSlider);
     LtoLSlider.setRange(-100, 100);
@@ -44,6 +42,13 @@ StereotypeAudioProcessorEditor::StereotypeAudioProcessorEditor (StereotypeAudioP
     addAndMakeVisible(RtoLLabel);
     RtoLLabel.setText("Right to left", juce::dontSendNotification);
     RtoLLabel.attachToComponent(&RtoLSlider, true);
+
+    addAndMakeVisible(OffsetSlider);
+    OffsetSlider.setRange(-2048, 2048);
+    OffsetSlider.setTextValueSuffix(" smp.");
+    addAndMakeVisible(OffsetSlider);
+    OffsetLabel.setText("Stereo offset", juce::dontSendNotification);
+    OffsetLabel.attachToComponent(&OffsetSlider, true);
 }
 
 StereotypeAudioProcessorEditor::~StereotypeAudioProcessorEditor()
@@ -69,4 +74,5 @@ void StereotypeAudioProcessorEditor::resized()
     LtoRSlider.setBounds(sliderLeft, 50, getWidth() - sliderLeft - 10, 20);
     RtoRSlider.setBounds(sliderLeft, 90, getWidth() - sliderLeft - 10, 20);
     RtoLSlider.setBounds(sliderLeft, 130, getWidth() - sliderLeft - 10, 20);
+    OffsetSlider.setBounds(sliderLeft, 170, getWidth() - sliderLeft - 10, 20);
 }
