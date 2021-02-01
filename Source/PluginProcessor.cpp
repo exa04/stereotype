@@ -16,6 +16,7 @@ juce::String StereotypeAudioProcessor::LtoRParam("Left to right");
 juce::String StereotypeAudioProcessor::RtoRParam("Right mix");
 juce::String StereotypeAudioProcessor::RtoLParam("Right to left");
 juce::String StereotypeAudioProcessor::OffsetParam("Stereo offset");
+juce::String StereotypeAudioProcessor::WidthParam("Width");
 
 StereotypeAudioProcessor::StereotypeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -36,7 +37,9 @@ StereotypeAudioProcessor::StereotypeAudioProcessor()
             mLtoL.get(), "%",
             juce::AudioProcessorParameter::genericParameter,
             [](float v, int) { return juce::String(v, 1); },
-            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
+            [](const juce::String& t) {
+                return t.dropLastCharacters(3).getFloatValue();
+            }),
 
         std::make_unique<juce::AudioParameterFloat>(LtoRParam,
             TRANS("Left to right"),
@@ -44,7 +47,9 @@ StereotypeAudioProcessor::StereotypeAudioProcessor()
             mLtoR.get(), "%",
             juce::AudioProcessorParameter::genericParameter,
             [](float v, int) { return juce::String(v, 1); },
-            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
+            [](const juce::String& t) {
+                return t.dropLastCharacters(3).getFloatValue();
+            }),
 
         std::make_unique<juce::AudioParameterFloat>(RtoRParam,
             TRANS("Right mix"),
@@ -58,6 +63,14 @@ StereotypeAudioProcessor::StereotypeAudioProcessor()
             TRANS("Right to left"),
             juce::NormalisableRange<float>(-100.0f, 100.0f, 0.001),
             mRtoL.get(), "%",
+            juce::AudioProcessorParameter::genericParameter,
+            [](float v, int) { return juce::String(v, 1); },
+            [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
+
+        std::make_unique<juce::AudioParameterFloat>(WidthParam,
+            TRANS("Width"),
+            juce::NormalisableRange<float>(0.0f, 100.0f, 0.001),
+            mWidth.get(), "%",
             juce::AudioProcessorParameter::genericParameter,
             [](float v, int) { return juce::String(v, 1); },
             [](const juce::String& t) { return t.dropLastCharacters(3).getFloatValue(); }),
@@ -77,6 +90,7 @@ StereotypeAudioProcessor::StereotypeAudioProcessor()
     mState.addParameterListener(RtoRParam, this);
     mState.addParameterListener(RtoLParam, this);
     mState.addParameterListener(OffsetParam, this);
+    mState.addParameterListener(WidthParam, this);
 }
 
 void StereotypeAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue) {
@@ -85,6 +99,7 @@ void StereotypeAudioProcessor::parameterChanged(const juce::String& parameterID,
     if (parameterID == RtoRParam) mRtoR = newValue;
     if (parameterID == RtoLParam) mRtoL = newValue;
     if (parameterID == OffsetParam) mOffset = newValue;
+    if (parameterID == WidthParam) mWidth = newValue;
 }
 
 void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
@@ -98,6 +113,7 @@ void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
     auto* channelDataL = buffer.getWritePointer(0);
     auto* channelDataR = buffer.getWritePointer(1);
+    
     for (int i = 0; i < buffer.getNumSamples(); ++i) {
         audioData[audioWrite][0] = channelDataL[i] * mLtoL.get() / 100;
         audioData[audioWrite][1] = channelDataR[i] * mRtoR.get() / 100;
@@ -105,14 +121,16 @@ void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         audioData[audioWrite][1] += channelDataL[i] * mLtoR.get() / 100;
         audioData[audioWrite][0] += channelDataR[i] * mRtoL.get() / 100;
 
-        if (abs(audioWrite) == audioWrite) {
-            channelDataL[i] = audioData[audioWrite][0];
-            channelDataR[i] = audioData[audioRead][1];
+        if (audioWrite > 0) {
+            side[i] = (audioData[audioWrite][0] - audioData[audioRead][1]) / 2;
+            mid[i] = (audioData[audioWrite][0] + audioData[audioRead][1]) / 2;
+        } else {
+            side[i] = (audioData[audioRead][0] - audioData[audioWrite][1]) / 2;
+            mid[i] = (audioData[audioRead][0] + audioData[audioWrite][1]) / 2;
         }
-        else {
-            channelDataR[i] = audioData[audioWrite][1];
-            channelDataL[i] = audioData[audioRead][0];
-        }
+
+        channelDataL[i] = (mid[i] * (100 - mWidth.get()) / 100 + side[i] * mWidth.get() / 100);
+        channelDataR[i] = (mid[i] * (100 - mWidth.get()) / 100 - side[i] * mWidth.get() / 100);
 
         audioWrite = (audioWrite + 1) % 2048;
         audioRead = (2048 + audioWrite - abs(mOffset.get())) % 2048;
