@@ -1,16 +1,8 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <JuceHeader.h>
 
-//==============================================================================
+//==================================================================================
 /**
 */
 class StereotypeAudioProcessor  : public juce::AudioProcessor,
@@ -62,13 +54,14 @@ public:
     static juce::String RtoRParam;
     static juce::String RtoLParam;
     static juce::String OffsetParam;
+    static juce::String WidthParam;
 
     juce::Atomic<float> mLtoL{ 100.0f };
     juce::Atomic<float> mLtoR{ 0.0f };
     juce::Atomic<float> mRtoR{ 100.0f };
     juce::Atomic<float> mRtoL{ 0.0f };
-
-    juce::Atomic<int> mOffset{ 0 };
+    juce::Atomic<int> mOffset{ 0.0f };
+    juce::Atomic<float> mWidth{ 50.0f };
 
 private:
 
@@ -76,6 +69,8 @@ private:
     juce::AudioProcessorValueTreeState mState;
 
     float audioData[2048][2];
+    float mid[2048];
+    float side[2048];
 
     int audioRead = 0;
     int audioWrite = 0;
