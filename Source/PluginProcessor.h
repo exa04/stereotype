@@ -5,6 +5,18 @@
 //==================================================================================
 /**
 */
+
+class Visualizer : public juce::AudioVisualiserComponent
+{
+public:
+    Visualizer() : AudioVisualiserComponent(2)
+    {
+        setBufferSize(512);
+        setSamplesPerBlock(256);
+    }
+};
+
+
 class StereotypeAudioProcessor  : public juce::AudioProcessor,
     public juce::AudioProcessorValueTreeState::Listener
 {
@@ -62,6 +74,8 @@ public:
     juce::Atomic<float> mRtoL{ 0.0f };
     juce::Atomic<int> mOffset{ 0.0f };
     juce::Atomic<float> mWidth{ 50.0f };
+
+    Visualizer visualizer;
 
 private:
 

@@ -6,6 +6,7 @@
 //==================================================================================
 /**
 */
+
 class StereotypeAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
@@ -21,6 +22,9 @@ private:
     // access the processor object that created it.
     StereotypeAudioProcessor& audioProcessor;
 
+    void createSlider(juce::Slider& slider, juce::Label& label, double rstart, double rend, std::string suffix, std::string name);
+    int sliderCount = 0;
+
     juce::Slider LtoLSlider;
     juce::Slider LtoRSlider;
     juce::Slider RtoRSlider;
@@ -33,6 +37,9 @@ private:
     juce::Label RtoLLabel;
     juce::Label OffsetLabel;
     juce::Label WidthLabel;
+
+    juce::Toolbar footer;
+    juce::Label footerTxt;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereotypeAudioProcessorEditor)
 
@@ -66,5 +73,4 @@ private:
         StereotypeAudioProcessor::WidthParam,
         WidthSlider
     };
-
 };

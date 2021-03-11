@@ -113,7 +113,7 @@ void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
 
     auto* channelDataL = buffer.getWritePointer(0);
     auto* channelDataR = buffer.getWritePointer(1);
-    
+
     for (int i = 0; i < buffer.getNumSamples(); ++i) {
         audioData[audioWrite][0] = channelDataL[i] * mLtoL.get() / 100;
         audioData[audioWrite][1] = channelDataR[i] * mRtoR.get() / 100;
@@ -129,12 +129,15 @@ void StereotypeAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
             mid[i] = (audioData[audioRead][0] + audioData[audioWrite][1]) / 2;
         }
 
-        channelDataL[i] = (mid[i] * (100 - mWidth.get()) / 100 + side[i] * mWidth.get() / 100);
-        channelDataR[i] = (mid[i] * (100 - mWidth.get()) / 100 - side[i] * mWidth.get() / 100);
+        auto recombine = abs(mWidth.get() / 2);
+
+        channelDataL[i] = (mid[i] * recombine / 100 + side[i] * (100 - recombine) / 100);
+        channelDataR[i] = (mid[i] * recombine / 100 - side[i] * (100 - recombine) / 100);
 
         audioWrite = (audioWrite + 1) % 2048;
         audioRead = (2048 + audioWrite - abs(mOffset.get())) % 2048;
     }
+    visualizer.pushBuffer(buffer);
 }
 
 StereotypeAudioProcessor::~StereotypeAudioProcessor()
@@ -206,6 +209,7 @@ void StereotypeAudioProcessor::changeProgramName (int index, const juce::String&
 //==============================================================================
 void StereotypeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    visualizer.clear();
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 }

@@ -9,53 +9,42 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+
 //==============================================================================
 StereotypeAudioProcessorEditor::StereotypeAudioProcessorEditor (StereotypeAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    setSize (600, 230);
+    setSize (600, 380);
+    getLookAndFeel().setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(255, 145, 191));
+    getLookAndFeel().setColour(juce::Slider::trackColourId, juce::Colour::fromRGB(244, 189, 217));
+    getLookAndFeel().setColour(juce::Slider::backgroundColourId, juce::Colour::fromRGB(238, 211, 230));
 
-    addAndMakeVisible(LtoLSlider);
-    LtoLSlider.setRange(-100, 100);
-    LtoLSlider.setTextValueSuffix("%");
-    addAndMakeVisible(LtoLLabel);
-    LtoLLabel.setText("Left mix", juce::dontSendNotification);
-    LtoLLabel.attachToComponent(&LtoLSlider, true);
+    getLookAndFeel().setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour::fromRGB(238, 211, 230));
+    getLookAndFeel().setColour(juce::Slider::textBoxOutlineColourId, juce::Colour::fromRGB(255, 145, 191));
+    getLookAndFeel().setColour(juce::Slider::textBoxTextColourId, juce::Colour::fromRGB(6, 6, 12));
+    getLookAndFeel().setColour(juce::Slider::textBoxHighlightColourId, juce::Colour::fromRGB(255, 145, 191));
+    
+    getLookAndFeel().setColour(juce::Label::textColourId, juce::Colour::fromRGB(6, 6, 12));
 
-    addAndMakeVisible(LtoRSlider);
-    LtoRSlider.setRange(-100, 100);
-    LtoRSlider.setTextValueSuffix("%");
-    addAndMakeVisible(LtoRLabel);
-    LtoRLabel.setText("Left to right", juce::dontSendNotification);
-    LtoRLabel.attachToComponent(&LtoRSlider, true);
+    getLookAndFeel().setColour(juce::ResizableWindow::backgroundColourId, juce::Colour::fromRGB(232, 233, 243));
 
-    addAndMakeVisible(RtoRSlider);
-    RtoRSlider.setRange(-100, 100);
-    RtoRSlider.setTextValueSuffix("%");
-    addAndMakeVisible(RtoRLabel);
-    RtoRLabel.setText("Right mix", juce::dontSendNotification);
-    RtoRLabel.attachToComponent(&RtoRSlider, true);
+    createSlider(LtoLSlider, LtoLLabel, -100, 100, "%", "Left mix");
+    createSlider(LtoRSlider, LtoRLabel, -100, 100, "%", "Left to right");
+    createSlider(RtoRSlider, RtoRLabel, -100, 100, "%", "Right mix");
+    createSlider(RtoLSlider, RtoLLabel, -100, 100, "%", "Right to left");
+    createSlider(OffsetSlider, OffsetLabel, -2048, 2048, " smp.", "Stereo offset");
+    createSlider(WidthSlider, WidthLabel, 0, 100, "%", "Width");
 
-    addAndMakeVisible(RtoLSlider);
-    RtoLSlider.setRange(-100, 100);
-    RtoLSlider.setTextValueSuffix("%");
-    addAndMakeVisible(RtoLLabel);
-    RtoLLabel.setText("Right to left", juce::dontSendNotification);
-    RtoLLabel.attachToComponent(&RtoLSlider, true);
+    addAndMakeVisible(audioProcessor.visualizer);
+    audioProcessor.visualizer.setColours(juce::Colour::fromRGB(238, 211, 230), juce::Colour::fromRGB(255, 145, 191));
 
-    addAndMakeVisible(OffsetSlider);
-    OffsetSlider.setRange(-2048, 2048);
-    OffsetSlider.setTextValueSuffix(" smp.");
-    addAndMakeVisible(OffsetSlider);
-    OffsetLabel.setText("Stereo offset", juce::dontSendNotification);
-    OffsetLabel.attachToComponent(&OffsetSlider, true);
+    footer.setColour(juce::Toolbar::backgroundColourId, getLookAndFeel().findColour(juce::Slider::trackColourId));
+    addAndMakeVisible(footer);
 
-    addAndMakeVisible(WidthSlider);
-    WidthSlider.setRange(0, 100);
-    WidthSlider.setTextValueSuffix(" smp.");
-    addAndMakeVisible(WidthSlider);
-    WidthLabel.setText("Stereo offset", juce::dontSendNotification);
-    WidthLabel.attachToComponent(&WidthSlider, true);
+    addAndMakeVisible(footerTxt);
+    footerTxt.setText("Stereotype by ari", juce::dontSendNotification);
+    footerTxt.setColour(juce::Label::backgroundColourId, juce::Colour::fromRGB(244, 189, 217));
+    footerTxt.setColour(juce::Label::textColourId, juce::Colour::fromRGB(6, 6, 12));
 }
 
 StereotypeAudioProcessorEditor::~StereotypeAudioProcessorEditor()
@@ -65,22 +54,35 @@ StereotypeAudioProcessorEditor::~StereotypeAudioProcessorEditor()
 //==============================================================================
 void StereotypeAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-    /*
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
-    */
 }
 
 void StereotypeAudioProcessorEditor::resized()
 {
     auto sliderLeft = 120;
-    LtoLSlider.setBounds(sliderLeft, 10, getWidth() - sliderLeft - 10, 20);
-    LtoRSlider.setBounds(sliderLeft, 50, getWidth() - sliderLeft - 10, 20);
-    RtoRSlider.setBounds(sliderLeft, 90, getWidth() - sliderLeft - 10, 20);
-    RtoLSlider.setBounds(sliderLeft, 130, getWidth() - sliderLeft - 10, 20);
-    OffsetSlider.setBounds(sliderLeft, 170, getWidth() - sliderLeft - 10, 20);
-    WidthSlider.setBounds(sliderLeft, 200, getWidth() - sliderLeft - 10, 20);
+    auto topOffset = 130;
+
+    audioProcessor.visualizer.setBounds(10, 10, getWidth() - 20, 110);
+
+    LtoLSlider.setBounds(sliderLeft, 0 + topOffset, getWidth() - sliderLeft - 10, 20);
+    LtoRSlider.setBounds(sliderLeft, 40 + topOffset, getWidth() - sliderLeft - 10, 20);
+    RtoRSlider.setBounds(sliderLeft, 80 + topOffset, getWidth() - sliderLeft - 10, 20);
+    RtoLSlider.setBounds(sliderLeft, 120 + topOffset, getWidth() - sliderLeft - 10, 20);
+    OffsetSlider.setBounds(sliderLeft, 160 + topOffset, getWidth() - sliderLeft - 10, 20);
+    WidthSlider.setBounds(sliderLeft, 200 + topOffset, getWidth() - sliderLeft - 10, 20);
+
+    auto area = getLocalBounds();
+
+    footerTxt.setBounds(area.removeFromBottom(20));
+}
+
+void StereotypeAudioProcessorEditor::createSlider(juce::Slider& slider, juce::Label& label, double rstart, double rend, std::string suffix, std::string name) {
+    addAndMakeVisible(slider);
+    slider.setRange(rstart, rend);
+    slider.setTextValueSuffix(suffix);
+    slider.setColour(juce::Slider::textBoxOutlineColourId, getLookAndFeel().findColour(juce::Slider::textBoxOutlineColourId));
+    addAndMakeVisible(label);
+    label.setText(name, juce::dontSendNotification);
+
+    label.attachToComponent(&slider, true);
 }
