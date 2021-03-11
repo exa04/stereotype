@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="VpNSpc" name="Stereotype" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              version="1.0.0" splashScreenColour="Light">
   <MAINGROUP id="r5D1dd" name="Stereotype">
     <GROUP id="{CA6DFD4B-E1B8-C43E-86D3-33A370E74849}" name="Source">
       <FILE id="NsjDB3" name="PluginProcessor.cpp" compile="1" resource="0"
